@@ -12,8 +12,19 @@ description := "example project for scala build of java sources"
 // Enables publishing to maven repo
 publishMavenStyle := true
 
-// Define location of local maven repo
-publishTo := Some(Resolver.file("file",  new File( "/tmp/" )) )
+// Define location of publishing target
+// local deployment (similar to "mvn install")
+// publishTo := Some(Resolver.file("file",  new File( "/data/local-maven-repo" )))
+// remote deployment (similar to "mvn deploy")
+publishTo := {
+  val nexus = "http://localhost:8081"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "/repository/sbt-snapshots")
+  else
+    Some("releases"  at nexus + "/repository/sbt-releases")
+}
+
+credentials += Credentials(Path.userHome / ".sbt" / "nexus-credentials.properties")
 
 // Do not append Scala versions to the generated artifacts
 crossPaths := false
